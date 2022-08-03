@@ -1,0 +1,65 @@
+spring:
+  ## API SECURITY WITH KEYCLOAK PROVIDER
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            authorization-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/auth
+            jwk-set-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/certs
+            token-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/token
+            user-info-authentication-method: header
+            user-info-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+        registration:
+          omtbp:
+            authorization-grant-type: authorization_code
+            client-id: ${app.config.keycloak.client-id}
+            client-secret: ${app.config.keycloak.client-secret}
+            provider: keycloak
+            redirect-uri: http://localhost:8080/login/oauth2/code/keycloak
+            scope: openid
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/certs
+
+  ##GATEWAY CONFIGURATIONS
+  cloud:
+    gateway:
+      routes:
+        ## User Service
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        ## Partner SERVICE
+        - id: partner-service
+          uri: lb://partner-service
+          predicates:
+            - Path=/partner/**
+          filters:
+            - StripPrefix=1
+
+#SECURITY BASED CONFIGURATIONS
+app:
+  config:
+    keycloak:
+      url: http://localhost:8080/auth
+      realm: online-movie-ticket-booking-platform
+      client-secret: 809773f3-a773-4a5c-93fc-7887e0a8c205
+      client-id: omtbp
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    hostname: localhost
+    prefer-ip-address: true

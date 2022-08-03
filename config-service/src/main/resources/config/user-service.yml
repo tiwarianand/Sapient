@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: jdbc:mysql://172.17.0.2:3306/user_service
+    username: root
+    password: root
+    createDatabaseIfNotExist: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka
+
+info:
+  app:
+    name: ${spring.application.name}
+app:
+  config:
+    key-cloak:
+      server-url: http://localhost:8080/auth
+      realm: online-movie-ticket-booking-platform
+      clientId: user-api-client
+      client-secret: a04a40e3-d14a-4854-98e8-d9544fa6c6a5
